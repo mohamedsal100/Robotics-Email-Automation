@@ -1,0 +1,140 @@
+{
+  "name": "Robotics-Email-Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a14dc244-e64a-4778-a9b4-1bf98d210e0d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Lqy0FhLHz1GtnKkUYK44F8LNsOVmZ3tHwlBy8x36R3k",
+          "mode": "list",
+          "cachedResultName": "Robotics Project",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Lqy0FhLHz1GtnKkUYK44F8LNsOVmZ3tHwlBy8x36R3k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Lqy0FhLHz1GtnKkUYK44F8LNsOVmZ3tHwlBy8x36R3k/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0efa7803-fb09-444e-9a1a-9148d4dfbd84",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IPIdFfPb2PeJtJox",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "pasharsalama8@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        0
+      ],
+      "id": "e9cb72ee-5bb2-4938-b63f-06e9903f45fc",
+      "name": "Send a message",
+      "webhookId": "9e93317c-f57f-422e-b834-d0f428c2c893",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jbr4w5JCXhYtexsF",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const row = item.json;\n\n  // Build a simple HTML table for members\n  let table = `\n    <table border=\"1\" cellpadding=\"5\" cellspacing=\"0\" style=\"border-collapse:collapse;\">\n      <tr>\n        <th>Name</th>\n        <th>ID</th>\n      </tr>\n  `;\n\n  // Loop through members (up to 6)\n  for (let i = 1; i <= 6; i++) {\n    const name = row[`Name of the ${i}st Member`] ||\n                 row[`Name of the ${i}nd Member`] ||\n                 row[`Name of the ${i}rd Member`] ||\n                 row[`Name of the ${i}th Member`];\n    const id = row[`ID of the ${i}st Member`] ||\n               row[`ID of the ${i}nd Member`] ||\n               row[`ID of the ${i}rd Member`] ||\n               row[`ID of the ${i}th Member`];\n\n    if (name) {\n      table += `<tr><td>${name}</td><td>${id || \"No ID\"}</td></tr>`;\n    }\n  }\n\n  table += \"</table>\";\n\n  return {\n    json: {\n      email: row[\"Group Leader's Email\"],\n      subject: `Robotics Project - ${row[\"Asssigned Robotic Arm\"]}`,\n      body: `\n        Hello,<br><br>\n        Here is your group assignment:<br><br>\n        ${table}<br><br>\n        <b>Assigned Robotic Arm:</b> ${row[\"Asssigned Robotic Arm\"]}<br>\n        <b>Comments:</b> ${row[\"comments\"] || \"None\"}<br><br>\n        Good luck,<br>\n        Robotics Team\n      `\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9e080788-0bf1-4956-9029-fd6f73474391",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fc4f6a57-038c-4a0a-b18c-c0fcfb32779e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea84a2664892471ef83efb879d309bc62583ee1e20ca23ea1ab6ae5eb7eeeabc"
+  },
+  "id": "PMoN7ZcEH8uyA5Kx",
+  "tags": []
+}
